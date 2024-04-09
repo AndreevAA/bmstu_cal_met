@@ -1,56 +1,63 @@
-function lab01()
+function main()
     clc();
 
-    debugFlg = 1;
-    delayS = 0.8;
-    a = 0;
-    b = 1;
-    eps = 0.01;
+    % Установка параметров
+    debugFlag = 1;
+    delaySeconds = 0.8;
+    intervalStart = 0;
+    intervalEnd = 1;
+    epsilon = 0.000001;
 
-    fplot(@f, [a, b]);
+    % Отображение графика функции
+    fplot(@functionToOptimize, [intervalStart, intervalEnd]);
     hold on;
 
-    [xStar, fStar] = bitwiseSearch(a, b, eps, debugFlg, delayS);
+    % Поиск оптимального значения
+    [optimalX, optimalF] = optimizeFunction(intervalStart, intervalEnd, epsilon, debugFlag, delaySeconds);
 
-    scatter(xStar, fStar, 'r', 'filled');
+    % Отображение оптимальной точки на графике
+    scatter(optimalX, optimalF, 'r', 'filled');
 end
 
-function [x0, f0] = bitwiseSearch(a, b, eps, debugFlg, delayS)
+function [optimalX, optimalF] = optimizeFunction(start, finish, epsilon, debugFlag, delaySeconds)
+    % Инициализация переменных
     i = 0;
-    delta = (b - a) / 4;
-    x0 = a;
-    f0 = f(x0);
+    delta = (finish - start) / 4;
+    x0 = start;
+    f0 = functionToOptimize(x0);
 
-    plot_x = [];
-    plot_f = [];
+    plotX = [];
+    plotF = [];
 
+    % Цикл оптимизации
     while 1
         i = i + 1;
         x1 = x0 + delta;
-        f1 = f(x1);
+        f1 = functionToOptimize(x1);
 
-        if debugFlg
-            fprintf('№ %2d x*=%.10f f(x*)=%.10f\n', i, x1, f1);
+        if debugFlag
+            fprintf('Iteration %2d: x=%.10f, f(x)=%.10f\n', i, x1, f1);
 
-            plot_x(end + 1) = x1;
-            plot_f(end + 1) = f1;
+            plotX(end + 1) = x1;
+            plotF(end + 1) = f1;
 
             clc();
-            plot(plot_x, plot_f, 'xk');
+            plot(plotX, plotF, 'xk');
 
             plot(x1, f1, 'xr');
             hold on;
-            pause(delayS);
+            pause(delaySeconds);
         end
 
+        % Проверка условия оптимизации
         if f0 > f1
             x0 = x1;
             f0 = f1;
 
-            if a < x0 && x0 < b
+            if start < x0 && x0 < finish
                 continue
             else
-                if abs(delta) <= eps
+                if abs(delta) <= epsilon
                     break;
                 else
                     x0 = x1;
@@ -59,7 +66,7 @@ function [x0, f0] = bitwiseSearch(a, b, eps, debugFlg, delayS)
                 end
             end
         else
-            if abs(delta) <= eps
+            if abs(delta) <= epsilon
                 break;
             else
                 x0 = x1;
@@ -70,14 +77,17 @@ function [x0, f0] = bitwiseSearch(a, b, eps, debugFlg, delayS)
     end
 
     i = i + 1;
-    if debugFlg
-        fprintf('№ %2d x*=%.10f f(x*)=%.10f\n', i, x0, f0);
-        fprintf('RESULT: x*=%.10f f(x*)=%.10f\n', x0, f0);
-        plot(plot_x, plot_f, 'xk');
+    if debugFlag
+        fprintf('Iteration %2d: x=%.10f, f(x)=%.10f\n', i, x0, f0);
+        fprintf('RESULT: x=%.10f, f(x)=%.10f\n', x0, f0);
+        plot(plotX, plotF, 'xk');
     end
+
+    optimalX = x0;
+    optimalF = f0;
 end
 
-function y = f(x)
-    y = exp((x^4) + (x^2) - x + sqrt(5)) + sinh((x^3 + 21 * x + 9) / (21*x +6)) - 3.0;
+function y = functionToOptimize(x)
+    y = exp(((x^4) + (x^2) - x + sqrt(5)) / 5) + sinh((x^3 + 21 * x + 9) / (21*x + 6)) - 3.0;
 end
 
