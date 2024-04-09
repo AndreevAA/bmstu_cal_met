@@ -9,7 +9,7 @@ function lab01()
 
     fplot(@f, [a, b]);
     hold on;
-    
+
     [xStar, fStar] = bitwiseSearch(a, b, eps, debugFlg, delayS);
 
     scatter(xStar, fStar, 'r', 'filled');
@@ -78,5 +78,6 @@ function [x0, f0] = bitwiseSearch(a, b, eps, debugFlg, delayS)
 end
 
 function y = f(x)
-    y = cos(power(x,5) - x + 3 + power(2, 1/3)) + atan((power(x,3) - 5 * sqrt(2)*x - 4) / (sqrt(6)*x + sqrt(3))) + 1.8;
+    y = exp((x^4) + (x^2) - x + sqrt(5)) + sinh((x^3 + 21 * x + 9) / (21*x +6)) - 3.0;
 end
+
