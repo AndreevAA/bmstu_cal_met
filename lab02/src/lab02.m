@@ -1,43 +1,45 @@
 function lab02()
-    clc();
+    clc; % Очистка командного окна
 
-    debugFlg = 1;
-    delayS = 0.8;
-    a = 0;
-    b = 1;
-    eps = 1e-6;
+    debugFlg = 1; % Флаг отладки
+    delayS = 0.8; % Задержка для отладочной информации
+    a = 0; % Начальное значение интервала
+    b = 1; % Конечное значение интервала
+    eps = 1e-6; % Точность
 
-    fplot(@f, [a, b]);
-    hold on;
+    x = linspace(a, b, 100); % Генерация точек для построения графика
+    y = arrayfun(@f, x); % Вычисление значений функции f для точек x
+    plot(x, y); % Построение графика функции f
+    hold on; % Удержание текущего графика на рисунке
 
-    pause(3);
-    [xStar, fStar] = goldenRatio(a, b, eps, debugFlg, delayS);
+    pause(3); % Пауза
 
-    scatter(xStar, fStar, 'r', 'filled');
+    [xStar, fStar] = goldenRatio(a, b, eps, debugFlg, delayS); % Вызов функции оптимизации
+
+    plot(xStar, fStar, 'ro'); % Подсветка точки минимума
 end
 
 function [xStar, fStar] = goldenRatio(a, b, eps, debugFlg, delayS)
-    tau = (sqrt(5) - 1) / 2;
-    l = b - a;
+    tau = (sqrt(5) - 1) / 2; % Золотое сечение
+    l = b - a; % Длина интервала
 
-    x1 = b - tau * l;
-    x2 = a + tau * l;
-    f1 = f(x1);
-    f2 = f(x2);
+    x1 = b - tau * l; % Вычисление первой точки
+    x2 = a + tau * l; % Вычисление второй точки
+    f1 = f(x1); % Вычисление значения функции в первой точке
+    f2 = f(x2); % Вычисление значения функции во второй точке
 
-    i = 0;
-    while 1
-        i = i + 1;
+    i = 0; % Счетчик итераций
+    while 1 % Бесконечный цикл
+        i = i + 1; % Увеличение счетчика итераций
 
         if debugFlg
-            fprintf('№ %2d ai=%.10f bi=%.10f\n', i, a, b);
-            line([a b], [f(a) f(b)], 'color', 'b');
-            %plot(a, f(a), 'xm', b, f(b), 'xb');
-            hold on;
-            pause(delayS);
+            fprintf('№ %2d ai=%.10f bi=%.10f\n', i, a, b); % Вывод отладочной информации
+            plot([a b], [f(a) f(b)], 'b'); % Построение отрезка
+            hold on; % Удержание текущего графика на рисунке
+            pause(delayS); % Пауза
         end
 
-        if l > 2 * eps
+        if l > 2 * eps % Проверка условия останова
             if f1 <= f2
                 b = x2;
                 l = b - a;
@@ -58,22 +60,21 @@ function [xStar, fStar] = goldenRatio(a, b, eps, debugFlg, delayS)
                 f2 = f(x2);
             end
         else
-            xStar = (a + b) / 2;
-            fStar= f(xStar);
-            break
+            xStar = (a + b) / 2; % Найденное приближение минимума
+            fStar = f(xStar); % Значение функции в найденном минимуме
+            break % Выход из цикла
         end
     end
 
-    i = i + 1;
+    i = i + 1; % Увеличение счетчика итераций
     if debugFlg
-        fprintf('№ %2d ai=%.10f bi=%.10f\n', i, a, b);
-        fprintf('RESULT: x*=%.10f f(x*)=%.10f\n', xStar, fStar);
-
-        line([a b], [f(a) f(b)], 'color', 'r');
+        fprintf('№ %2d ai=%.10f bi=%.10f\n', i, a, b); % Вывод отладочной информации
+        fprintf('RESULT: x*=%.10f f(x*)=%.10f\n', xStar, fStar); % Вывод результата
+        plot([a b], [f(a) f(b)], 'r'); % Подсветка отрезка
     end
 end
 
 function y = f(x)
-    %y = cos(power(x,5) - x + 3 + power(2, 1/3)) + atan((power(x,3) - 5 * sqrt(2)*x - 4) / (sqrt(6)*x + sqrt(3))) + 1.8;
-    y = (x - 0.50)^4;
+    y = exp(((x^4) + (x^2) - x + sqrt(5)) / 5) + sinh((x^3 + 21 * x + 9) / (21*x + 6)) - 3.0;
+    %y = (x - 0.50)^4; % Определение функции
 end
