@@ -6,7 +6,7 @@ function main()
     delaySeconds = 0.8;
     intervalStart = 0;
     intervalEnd = 1;
-    epsilon = 0.000001;
+    epsilon = 0.01;
 
     % Отображение графика функции
     fplot(@functionToOptimize, [intervalStart, intervalEnd]);
@@ -35,19 +35,18 @@ function [optimalX, optimalF] = optimizeFunction(start, finish, epsilon, debugFl
         x1 = x0 + delta;
         f1 = functionToOptimize(x1);
 
-        if debugFlag
-            fprintf('Iteration %2d: x=%.10f, f(x)=%.10f\n', i, x1, f1);
+        fprintf('Iteration %2d: x=%.10f, f(x)=%.10f\n', i, x1, f1);
 
-            plotX(end + 1) = x1;
-            plotF(end + 1) = f1;
+        plotX(end + 1) = x1;
+        plotF(end + 1) = f1;
 
-            clc();
-            plot(plotX, plotF, 'xk');
+        clc();
+        plot(plotX, plotF, 'xk');
 
-            plot(x1, f1, 'xr');
-            hold on;
-            pause(delaySeconds);
-        end
+        plot(x1, f1, 'xr');
+        hold on;
+        pause(delaySeconds);
+
 
         % Проверка условия оптимизации
         if f0 > f1
@@ -65,29 +64,30 @@ function [optimalX, optimalF] = optimizeFunction(start, finish, epsilon, debugFl
                     delta = -delta / 4;
                 end
             end
-        else
-            if abs(delta) <= epsilon
-                break;
-            else
-                x0 = x1;
-                f0 = f1;
-                delta = -delta / 4;
-            end
+        end
+        if f0 <= f1 && abs(delta) <= epsilon
+          break
+        end
+
+        if f0 <= f1 && abs(delta) > epsilon
+          x0 = x1;
+          f0 = f1;
+          delta = -delta / 4;
         end
     end
 
     i = i + 1;
-    if debugFlag
-        fprintf('Iteration %2d: x=%.10f, f(x)=%.10f\n', i, x0, f0);
-        fprintf('RESULT: x=%.10f, f(x)=%.10f\n', x0, f0);
-        plot(plotX, plotF, 'xk');
-    end
+
+    fprintf('Iteration %2d: x=%.10f, f(x)=%.10f\n', i, x0, f0);
+    fprintf('RESULT: x=%.10f, f(x)=%.10f\n', x0, f0);
+    plot(plotX, plotF, 'xk');
 
     optimalX = x0;
     optimalF = f0;
 end
 
 function y = functionToOptimize(x)
+    %y = x;
     y = exp(((x^4) + (x^2) - x + sqrt(5)) / 5) + sinh((x^3 + 21 * x + 9) / (21*x + 6)) - 3.0;
 end
 
